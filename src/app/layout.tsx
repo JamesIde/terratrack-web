@@ -14,10 +14,18 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <div className="flex">
-        <Sidebar />
-        <div className="w-full">{children}</div>
-      </div>
+      <head>
+        <link
+          href="https://api.mapbox.com/mapbox-gl-js/v2.1.1/mapbox-gl.css"
+          rel="stylesheet"
+        />
+      </head>
+      <body>
+        <div className="flex">
+          <Sidebar />
+          <div className="w-full">{children}</div>
+        </div>
+      </body>
     </html>
   );
 }
