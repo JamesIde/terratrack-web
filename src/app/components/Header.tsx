@@ -1,7 +1,6 @@
 import { SignedIn, UserButton, auth } from "@clerk/nextjs";
 import { BiPlus } from "react-icons/bi";
 function Header() {
-  const user = auth();
   return (
     <div className="h-16 flex flex-row justify-between p-5">
       <SignedIn>
