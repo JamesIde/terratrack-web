@@ -7,7 +7,8 @@ function Mapbox() {
   let longlat = [138.778, -35.054];
   let zoom = 13;
   const mapContainer = useRef(null);
-  mapboxGL.accessToken = CONFIG.MAPBOX.ACCESS_TOKEN;
+  mapboxGL.accessToken = CONFIG.MAPBOX.ACCESS_TOKEN as string;
+  // console.log(CONFIG.MAPBOX.ACCESS_TOKEN);
   useEffect(() => {
     const map: Map = new mapboxGL.Map({
       container: mapContainer.current,
