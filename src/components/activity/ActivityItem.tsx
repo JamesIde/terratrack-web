@@ -44,15 +44,13 @@ function ActivityItem({ activity }: { activity: Activity }) {
             </p>
           </div>
           <div className="flex flex-col gap-2">
+            <p className="text-xs font-semibold text-gray-700">CATEGORY</p>
+            <p className="text-xs text-center">{activity.type}</p>
+          </div>
+          <div className="flex flex-col gap-2">
             <p className="text-xs font-semibold text-gray-700">GAIN</p>
             <p className="text-xs text-center">
               {formatElevation(activity.elevation.elevationGain ?? 0)}
-            </p>
-          </div>
-          <div className="flex flex-col gap-2">
-            <p className="text-xs font-semibold text-gray-700">LOSS</p>
-            <p className="text-xs text-center">
-              {formatElevation(activity.elevation.minElevation ?? 0)}
             </p>
           </div>
         </div>

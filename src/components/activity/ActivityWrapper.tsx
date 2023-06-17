@@ -84,7 +84,7 @@ function ActivityWrapper() {
             )}
           </div>
         ) : (
-          <SelectedActivityWrapper />
+          <SelectedActivityWrapper activity={storeActivity} />
         )}
       </SignedIn>
     </div>
