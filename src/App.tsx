@@ -14,8 +14,10 @@ function App() {
 function Wrapper() {
   return (
     <div className="flex bg-[#f2f7fc]">
-      <Sidebar />
-      <div className="w-full">
+      <div className="w-full sm:w-[500px] h-screen overflow-y-auto">
+        <Sidebar />
+      </div>
+      <div className="hidden sm:block w-auto flex-grow">
         <Mapbox />
       </div>
     </div>

@@ -5,7 +5,7 @@ import Title from "../general/Title";
 
 function Sidebar() {
   return (
-    <aside className="w-[500px] h-screen overflow-y-auto">
+    <aside className="">
       <Header />
       <Title />
       <AuthButtons />

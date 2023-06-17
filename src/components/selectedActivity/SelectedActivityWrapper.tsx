@@ -28,7 +28,7 @@ function SelectedActivityWrapper({ activity }: { activity: Activity }) {
       </div>
       <div>
         <header>
-          <h1 className="font-bold text-black text-2xl text-center mt-4">
+          <h1 className="font-bold text-black text-2xl text-center mt-4 mb-1">
             {activity.description}
           </h1>
           <hr

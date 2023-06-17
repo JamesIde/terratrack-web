@@ -16,7 +16,7 @@ function Mapbox() {
 
   const { isLoaded, isSignedIn, userId } = useAuth();
   const [stateMap, setStateMap] = useState<Map>();
-
+  const [activities, setActivities] = useState<Activity[]>([]);
   const mapContainer = useRef(null);
   const map = useRef<Map>();
 
@@ -45,6 +45,8 @@ function Mapbox() {
             .eq("userId", userId)
             .then((resp) => {
               let activities = processSupabaseActivities(resp.data);
+              // Set in state, but don't use them to render the map
+              setActivities(activities);
               activities.map((activity, index) => {
                 if (!map.current?.getLayer(activity.id)) {
                   map.current?.addSource(activity.id, {
@@ -89,7 +91,7 @@ function Mapbox() {
                     map.current!.getCanvas().style.cursor = "";
                     map.current!.setPaintProperty(activity.id, "line-width", 4);
                   });
-                  map.current?.on("click", `${activity.id}-fill`, (ev) => {
+                  map.current?.on("click", `${activity.id}`, (ev) => {
                     flyToMap(map.current!, activity);
                     if (!storeActivity) {
                       setStoreActivity(activity);
@@ -107,9 +109,15 @@ function Mapbox() {
 
   useEffect(() => {
     if (storeActivity) {
+      setMapLayerVisibility(storeActivity.id);
       flyToMap(stateMap!, storeActivity);
     } else {
-      resetMapBounds();
+      setMapLayerVisibility(null);
+      stateMap?.flyTo({
+        center: longlat as mapboxGL.LngLatLike,
+        zoom: zoom,
+        essential: true,
+      });
     }
   }, [storeActivity]);
 
@@ -121,18 +129,34 @@ function Mapbox() {
     });
   }
 
-  function resetMapBounds() {
-    map.current?.fitBounds(
-      [
-        // TODO - fix this
-        [138.770306, -34.97434],
-        [138.770306, -34.97434],
-      ],
-      {
-        padding: 20,
-        zoom: 11,
+  /**
+   * Toggles map layer visibility based on activityId passed in on 'click'
+   */
+  function setMapLayerVisibility(activityId: string | null) {
+    activities.forEach((act) => {
+      if (activityId) {
+        // Hide all except 'clicked'
+        const visibility = act.id === activityId ? "visible" : "none";
+        if (map.current?.getLayer(act.id)) {
+          map.current?.setLayoutProperty(act.id, "visibility", visibility);
+          map.current?.setLayoutProperty(
+            `${act.id}-fill`,
+            "visibility",
+            visibility
+          );
+        }
+      } else {
+        // Show all
+        if (map.current?.getLayer(act.id)) {
+          map.current?.setLayoutProperty(act.id, "visibility", "visible");
+          map.current?.setLayoutProperty(
+            `${act.id}-fill`,
+            "visibility",
+            "visible"
+          );
+        }
       }
-    );
+    });
   }
 
   return <div ref={mapContainer} className="h-screen relative w-full" />;
