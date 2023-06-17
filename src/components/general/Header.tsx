@@ -1,12 +1,11 @@
 import { SignedIn, UserButton } from "@clerk/clerk-react";
-import { BiPlus } from "react-icons/bi";
 function Header() {
   return (
-    <div className="h-16 flex flex-row justify-between p-5">
+    <div className="flex flex-row justify-between mt-5 mx-5">
       <SignedIn>
         <UserButton afterSignOutUrl="/" />
-        <button className="bg-red-400 rounded-full w-7 h-7 flex items-center justify-center hover:bg-red-900 duration-500">
-          <BiPlus className="text-white text-xl font-bold" />
+        <button className="p-2 rounded-xl bg-forest-50 hover:bg-forest-100 font-bold text-forest-dark">
+          Add Route
         </button>
       </SignedIn>
     </div>
