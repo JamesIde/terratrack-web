@@ -4,11 +4,13 @@ import { Map } from "mapbox-gl";
 import { useEffect, useRef } from "react";
 import { supabase } from "../../lib/supabase";
 import { processSupabaseActivities } from "../../utils/processActivities";
+import * as Turf from "@turf/turf";
+import { Activity } from "../../@types/activity";
+
 function Mapbox() {
   const { isLoaded, isSignedIn, userId } = useAuth();
-
-  let longlat = [138.778, -35.054];
-  let zoom = 12;
+  let longlat = [138.770306, -34.97434];
+  let zoom = 11;
   const mapContainer = useRef(null);
   let map: Map = {} as any;
   mapboxGL.accessToken = import.meta.env
@@ -77,7 +79,7 @@ function Mapbox() {
                     map.setPaintProperty(activity.id, "line-width", 4);
                   });
                   map.on("click", `${activity.id}-fill`, (ev) => {
-                    console.log(activity.id);
+                    flyToMap(map, activity);
                   });
                 }
               });
@@ -87,6 +89,15 @@ function Mapbox() {
     }
     // return () => map.remove();
   }, [userId, isLoaded, isSignedIn]);
+
+  function flyToMap(map: Map, activity: Activity) {
+    let boundary = Turf.lineString(activity.coordinates);
+    let bbox = Turf.bbox(boundary);
+    map.fitBounds(bbox, {
+      padding: 20,
+    });
+  }
+
   return <div ref={mapContainer} className="h-screen relative w-full" />;
 }
 export default Mapbox;

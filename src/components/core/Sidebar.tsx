@@ -1,7 +1,7 @@
 import ActivityWrapper from "../activity/ActivityWrapper";
-import AuthButtons from "./general/AuthButtons";
-import Header from "./general/Header";
-import Title from "./general/Title";
+import AuthButtons from "../general/AuthButtons";
+import Header from "../general/Header";
+import Title from "../general/Title";
 
 function Sidebar() {
   return (
