@@ -5,6 +5,7 @@ export interface Activity {
   startTime: Date;
   endTime: Date;
   distance: number;
+  distancePoints?: number[];
   coordinates: Position[];
   id: string;
   userId?: string;

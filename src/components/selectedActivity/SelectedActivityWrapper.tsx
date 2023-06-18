@@ -8,22 +8,20 @@ import {
   formatElevation,
   processElevation,
 } from "../../utils/processElevation";
+import ElevationChart from "./ElevationChart";
 function SelectedActivityWrapper({ activity }: { activity: Activity }) {
-  console.log(activity);
   const setStoreActivity = useActivityStore((state) => state.setStoreActivity);
+  console.log(activity.distancePoints);
   return (
     <>
-      <div className="flex justify-between p-4 border-b-[1px] border-b-gray-400">
-        <button className="font-bold" onClick={() => setStoreActivity(null)}>
-          <SlArrowLeft className="inline-block mr-2 text-xs mb-1" />
-          Activities
-        </button>
+      <div className="flex justify-between p-4 border-b-[1px] border-b-gray-300">
         <button
           className="p-2 bg-forest-50 rounded-xl hover:bg-forest-100
         text-forest-dark font-bold"
+          onClick={() => setStoreActivity(null)}
         >
-          <HiDownload className="inline-block mr-2 text-md mb-1" />
-          Download GPX
+          <SlArrowLeft className="inline-block mr-2 text-xs mb-1" />
+          Go Back
         </button>
       </div>
       <div>
@@ -37,10 +35,11 @@ function SelectedActivityWrapper({ activity }: { activity: Activity }) {
               height: 4,
               width: "60%",
               margin: "auto",
+              borderRadius: 10,
             }}
           />
         </header>
-        <section>
+        <p>
           <p className="mt-2 font-semibold text-gray-700 text-center">
             {new Date(activity.startTime).toLocaleDateString("en-au", {
               weekday: "long",
@@ -49,9 +48,14 @@ function SelectedActivityWrapper({ activity }: { activity: Activity }) {
               day: "numeric",
             })}
           </p>
-          <div className="pl-4 pr-4 mt-2">
+        </p>
+        <section>
+          <ElevationChart activity={activity} />
+        </section>
+        <section>
+          <div className="pl-4 pr-4">
             <div className="flex flex-row justify-evenly mt-2 mb-5 gap-5">
-              <div className="p-2 border-[1px] rounded-lg border-gray-400 w-full">
+              <div className="p-2 border-[1px] rounded-lg border-gray-300 w-full">
                 <p className="text-md font-semibold text-gray-700 text-center">
                   DISTANCE
                 </p>
@@ -60,7 +64,7 @@ function SelectedActivityWrapper({ activity }: { activity: Activity }) {
                   {processDistance(activity.distance)}
                 </p>
               </div>
-              <div className="p-2 border-[1px] rounded-lg border-gray-400 w-full">
+              <div className="p-2 border-[1px] rounded-lg border-gray-300 w-full">
                 <p className="text-md font-semibold text-gray-700 text-center">
                   DURATION
                 </p>
@@ -71,13 +75,13 @@ function SelectedActivityWrapper({ activity }: { activity: Activity }) {
               </div>
             </div>
             <div className="flex flex-row justify-evenly mt-2 mb-2 gap-5">
-              <div className="p-2 border-[1px] rounded-lg border-gray-400 w-full">
+              <div className="p-2 border-[1px] rounded-lg border-gray-300 w-full">
                 <p className="text-md font-semibold text-gray-700 text-center">
                   CATEGORY
                 </p>
                 <p className="text-md text-center"> {activity.type}</p>
               </div>
-              <div className="p-2 border-[1px] rounded-lg border-gray-400 w-full">
+              <div className="p-2 border-[1px] rounded-lg border-gray-300 w-full">
                 <p className="text-md font-semibold text-gray-700 text-center">
                   ELEVATION GAIN
                 </p>

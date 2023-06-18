@@ -40,7 +40,7 @@ function ActivityWrapper() {
   };
 
   return (
-    <div className="mt-20">
+    <div className="mt-12">
       <SignedIn>
         {!storeActivity ? (
           <div>

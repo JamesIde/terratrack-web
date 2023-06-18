@@ -12,6 +12,9 @@ export default {
           100: '#E0EECD',
           'dark': "#7AA53B"
         }
+      },
+      fontFamily: {
+        'sans': ['"Proxima Nova"', 'sans-serif'],
       }
     },
   },

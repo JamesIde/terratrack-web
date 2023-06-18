@@ -25,31 +25,31 @@ function ActivityItem({ activity }: { activity: Activity }) {
           }}
         />
         <div className="w-full flex items-center justify-between">
-          <h3 className="font-semibold text-md">{activity.description}</h3>
+          <h3 className="font-semibold text-lg">{activity.description}</h3>
           <HiArrowRight />
         </div>
       </div>
       <section>
         <div className="flex flex-row justify-between mt-2 mb-2">
           <div className="flex flex-col gap-2">
-            <p className="text-xs font-semibold text-gray-700">DISTANCE</p>
-            <p className="text-xs text-center">
+            <p className="text-sm font-semibold text-gray-700">DISTANCE</p>
+            <p className="text-sm text-center">
               {processDistance(activity.distance)}
             </p>
           </div>
           <div className="flex flex-col gap-2">
-            <p className="text-xs font-semibold text-gray-700">DURATION</p>
-            <p className="text-xs text-center">
+            <p className="text-sm font-semibold text-gray-700">DURATION</p>
+            <p className="text-sm text-center">
               {formatShortFormTime(activity.duration)}
             </p>
           </div>
           <div className="flex flex-col gap-2">
-            <p className="text-xs font-semibold text-gray-700">CATEGORY</p>
-            <p className="text-xs text-center">{activity.type}</p>
+            <p className="text-sm font-semibold text-gray-700">CATEGORY</p>
+            <p className="text-sm text-center">{activity.type}</p>
           </div>
           <div className="flex flex-col gap-2">
-            <p className="text-xs font-semibold text-gray-700">GAIN</p>
-            <p className="text-xs text-center">
+            <p className="text-sm font-semibold text-gray-700">GAIN</p>
+            <p className="text-sm text-center">
               {formatElevation(activity.elevation.elevationGain ?? 0)}
             </p>
           </div>

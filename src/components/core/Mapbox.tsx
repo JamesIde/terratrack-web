@@ -4,7 +4,7 @@ import { Map } from "mapbox-gl";
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "../../lib/supabase";
 import { processSupabaseActivities } from "../../utils/processActivities";
-import * as Turf from "@turf/turf";
+import * as Turf from "@turf/turf"; // eslint-disable-line
 import { Activity } from "../../@types/activity";
 import { useActivityStore } from "../../stores/activityStore";
 
@@ -45,6 +45,7 @@ function Mapbox() {
             .eq("userId", userId)
             .then((resp) => {
               let activities = processSupabaseActivities(resp.data);
+              console.log(activities[0].coordinates.slice(0, 5));
               // Set in state, but don't use them to render the map
               setActivities(activities);
               activities.map((activity, index) => {
@@ -92,7 +93,6 @@ function Mapbox() {
                     map.current!.setPaintProperty(activity.id, "line-width", 4);
                   });
                   map.current?.on("click", `${activity.id}`, (ev) => {
-                    flyToMap(map.current!, activity);
                     if (!storeActivity) {
                       setStoreActivity(activity);
                     }

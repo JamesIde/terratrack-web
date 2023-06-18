@@ -10,14 +10,19 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "chart.js": "^4.2.1",
+    "chartjs-plugin-crosshair": "^1.2.0",
     "@clerk/clerk-react": "^4.20.1",
     "@supabase/supabase-js": "^2.25.0",
     "@turf/turf": "^6.5.0",
     "@types/mapbox-gl": "^2.7.11",
+    "geojson-precision": "^1.0.0",
     "mapbox-gl": "^2.15.0",
     "react": "^18.2.0",
+    "react-chartjs-2": "^5.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^4.9.0",
+    "simplify-geojson": "^1.0.5",
     "zustand": "^4.3.8"
   },
   "devDependencies": {
