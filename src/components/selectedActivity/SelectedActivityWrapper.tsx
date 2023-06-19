@@ -1,13 +1,9 @@
 import { Activity } from "../../@types/activity";
 import { useActivityStore } from "../../stores/activityStore";
 import { SlArrowLeft } from "react-icons/sl";
-import { HiDownload } from "react-icons/hi";
 import { processDistance } from "../../utils/processDistance";
 import { formatShortFormTime } from "../../utils/processTime";
-import {
-  formatElevation,
-  processElevation,
-} from "../../utils/processElevation";
+import { formatElevation } from "../../utils/processElevation";
 import ElevationChart from "./ElevationChart";
 function SelectedActivityWrapper({ activity }: { activity: Activity }) {
   const setStoreActivity = useActivityStore((state) => state.setStoreActivity);

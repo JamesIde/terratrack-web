@@ -29,9 +29,9 @@ function Mapbox() {
     if (isLoaded) {
       if (map.current) return;
       map.current = new mapboxGL.Map({
-        container: mapContainer.current,
+        container: mapContainer.current as any,
         style: "mapbox://styles/mapbox/outdoors-v11",
-        center: longlat,
+        center: longlat as any,
         zoom: zoom,
       });
       map.current.addControl(new mapboxGL.NavigationControl());
@@ -45,11 +45,11 @@ function Mapbox() {
             .eq("userId", userId)
             .then((resp) => {
               let activities = processSupabaseActivities(resp.data);
-              console.log(activities[0].coordinates.slice(0, 5));
               // Set in state, but don't use them to render the map
               setActivities(activities);
-              activities.map((activity, index) => {
+              activities.map((activity) => {
                 if (!map.current?.getLayer(activity.id)) {
+                  // Add the geojson source of each activity
                   map.current?.addSource(activity.id, {
                     type: "geojson",
                     data: {
@@ -61,6 +61,7 @@ function Mapbox() {
                       properties: {},
                     },
                   });
+                  // Add the line layer on top of the geojson source
                   map.current?.addLayer({
                     id: activity.id,
                     type: "line",
@@ -74,7 +75,6 @@ function Mapbox() {
                       "line-width": 4,
                     },
                   });
-
                   map.current?.addLayer({
                     id: `${activity.id}-fill`,
                     type: "fill",
@@ -92,7 +92,7 @@ function Mapbox() {
                     map.current!.getCanvas().style.cursor = "";
                     map.current!.setPaintProperty(activity.id, "line-width", 4);
                   });
-                  map.current?.on("click", `${activity.id}`, (ev) => {
+                  map.current?.on("click", `${activity.id}`, () => {
                     if (!storeActivity) {
                       setStoreActivity(activity);
                     }

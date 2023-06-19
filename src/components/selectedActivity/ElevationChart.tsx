@@ -8,13 +8,9 @@ import {
   LineElement,
   Title,
   Legend,
-  ChartOptions,
   ChartData,
 } from "chart.js";
-import { CrosshairPlugin } from "chartjs-plugin-crosshair";
-import { useMemo, useState } from "react";
 import { Line } from "react-chartjs-2";
-import { HCoord, haversineDistance } from "../../utils/haversineDistance";
 function ElevationChart({ activity }: { activity: Activity }) {
   const data = activity.elevation.elevationPoints.map((data) =>
     parseFloat(data.toFixed(0))
