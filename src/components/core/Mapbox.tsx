@@ -7,6 +7,7 @@ import { processSupabaseActivities } from "../../utils/processActivities";
 import * as Turf from "@turf/turf"; // eslint-disable-line
 import { Activity } from "../../@types/activity";
 import { useActivityStore } from "../../stores/activityStore";
+import { LAYER_CONFIG } from "./Paint";
 
 function Mapbox() {
   const [storeActivity, setStoreActivity] = useActivityStore((state) => [
@@ -17,6 +18,7 @@ function Mapbox() {
   const { isLoaded, isSignedIn, userId } = useAuth();
   const [stateMap, setStateMap] = useState<Map>();
   const [activities, setActivities] = useState<Activity[]>([]);
+
   const mapContainer = useRef(null);
   const map = useRef<Map>();
 
@@ -58,7 +60,9 @@ function Mapbox() {
                         type: "LineString",
                         coordinates: activity.coordinates,
                       },
-                      properties: {},
+                      properties: {
+                        description: "Activity",
+                      },
                     },
                   });
                   // Add the line layer on top of the geojson source
@@ -134,26 +138,97 @@ function Mapbox() {
    */
   function setMapLayerVisibility(activityId: string | null) {
     activities.forEach((act) => {
-      if (activityId) {
-        // Hide all except 'clicked'
-        const visibility = act.id === activityId ? "visible" : "none";
-        if (map.current?.getLayer(act.id)) {
-          map.current?.setLayoutProperty(act.id, "visibility", visibility);
-          map.current?.setLayoutProperty(
-            `${act.id}-fill`,
-            "visibility",
-            visibility
-          );
+      const visibility = activityId
+        ? act.id === activityId
+          ? "visible"
+          : "none"
+        : "visible";
+
+      map.current?.setLayoutProperty(act.id, "visibility", visibility);
+
+      const startCircleSourceId = `${activityId}-start-circle`;
+      const startCircleLayerId = `${activityId}-start`;
+
+      const endCircleSourceId = `${activityId}-end-circle`;
+      const endCircleLayerId = `${activityId}-end`;
+
+      if (act.id === activityId) {
+        setCircleLayers({
+          endCircle: endCircleLayerId,
+          startCircle: startCircleLayerId,
+        });
+        if (
+          !map.current?.getSource(startCircleSourceId) &&
+          !map.current?.getSource(endCircleSourceId)
+        ) {
+          map.current?.addSource(startCircleSourceId, {
+            type: "geojson",
+            data: {
+              type: "Feature",
+              geometry: {
+                type: "Point",
+                coordinates: act.coordinates[0],
+              },
+              properties: {
+                description: "Start Circle of a gps track",
+              },
+            },
+          });
+
+          map.current?.addSource(endCircleSourceId, {
+            type: "geojson",
+            data: {
+              type: "Feature",
+              geometry: {
+                type: "Point",
+                coordinates: act.coordinates.pop()!,
+              },
+              properties: {
+                description: "End Circle of a gps track",
+              },
+            },
+          });
         }
+        map.current?.addLayer({
+          id: startCircleLayerId,
+          type: "circle",
+          source: startCircleSourceId,
+          layout: {
+            visibility: "visible",
+          },
+          paint: LAYER_CONFIG.paint.start,
+        });
+        map.current?.addLayer({
+          id: endCircleLayerId,
+          type: "circle",
+          source: endCircleSourceId,
+          layout: {
+            visibility: "visible",
+          },
+          paint: LAYER_CONFIG.paint.end,
+        });
       } else {
-        // Show all
-        if (map.current?.getLayer(act.id)) {
-          map.current?.setLayoutProperty(act.id, "visibility", "visible");
-          map.current?.setLayoutProperty(
-            `${act.id}-fill`,
-            "visibility",
-            "visible"
-          );
+        // Show all layers
+        map.current?.setLayoutProperty(
+          `${act.id}-fill`,
+          "visibility",
+          "visible"
+        );
+        // Duplication of above, because we don't know which activity was previously selected, we need to re-assign for each track
+        // THEN check if the layer exists, if it does, then it was the previously selected activity, so remove it + source
+        const startCircleSourceId = `${act.id}-start-circle`;
+        const startCircleLayerId = `${act.id}-start`;
+
+        const endCircleSourceId = `${act.id}-end-circle`;
+        const endCircleLayerId = `${act.id}-end`;
+        if (
+          map.current?.getLayer(startCircleLayerId) &&
+          map.current?.getLayer(endCircleLayerId)
+        ) {
+          map.current?.removeLayer(startCircleLayerId);
+          map.current?.removeLayer(endCircleLayerId);
+          map.current?.removeSource(startCircleSourceId);
+          map.current?.removeSource(endCircleSourceId);
         }
       }
     });

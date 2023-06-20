@@ -7,7 +7,6 @@ import { formatElevation } from "../../utils/processElevation";
 import ElevationChart from "./ElevationChart";
 function SelectedActivityWrapper({ activity }: { activity: Activity }) {
   const setStoreActivity = useActivityStore((state) => state.setStoreActivity);
-  console.log(activity.distancePoints);
   return (
     <>
       <div className="flex justify-between p-4 border-b-[1px] border-b-gray-300">
