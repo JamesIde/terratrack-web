@@ -153,10 +153,6 @@ function Mapbox() {
       const endCircleLayerId = `${activityId}-end`;
 
       if (act.id === activityId) {
-        setCircleLayers({
-          endCircle: endCircleLayerId,
-          startCircle: startCircleLayerId,
-        });
         if (
           !map.current?.getSource(startCircleSourceId) &&
           !map.current?.getSource(endCircleSourceId)
