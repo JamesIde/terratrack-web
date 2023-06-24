@@ -11,11 +11,12 @@ import {
   ChartData,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
+import { useMarkerStore } from "../../stores/markerStore";
 function ElevationChart({ activity }: { activity: Activity }) {
   const data = activity.elevation.elevationPoints.map((data) =>
     parseFloat(data.toFixed(0))
   );
-
+  const setMarkerIndex = useMarkerStore((state) => state.setMarkerIndex);
   ChartJS.register(
     CategoryScale,
     LinearScale,
@@ -58,6 +59,7 @@ function ElevationChart({ activity }: { activity: Activity }) {
         callbacks: {
           title: () => "",
           label: (context: any) => {
+            setMarkerIndex(context.dataIndex);
             const elevation = context.parsed.y || 0;
             const additionalData = `Distance: ${formatDistanceLabel(
               context.label

@@ -1,27 +1,36 @@
 import { useAuth } from "@clerk/clerk-react";
-import mapboxGL from "mapbox-gl"; // eslint-disable-line import/no-webpack-loader-syntax
+import mapboxGL, { LngLatLike, Marker } from "mapbox-gl"; // eslint-disable-line import/no-webpack-loader-syntax
 import { Map } from "mapbox-gl";
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "../../lib/supabase";
 import { processSupabaseActivities } from "../../utils/processActivities";
-import * as Turf from "@turf/turf"; // eslint-disable-line
 import { Activity } from "../../@types/activity";
 import { useActivityStore } from "../../stores/activityStore";
-import { LAYER_CONFIG } from "./Paint";
+import { useMarkerStore } from "../../stores/markerStore";
+import { CONFIG } from "../../config/config";
+import {
+  addGpxSourcesAndLayers,
+  addStartEndCircles,
+  flyToMap,
+  hideStartEndCircles,
+} from "./MapboxUtils";
+import mapboxgl from "mapbox-gl";
 
-function Mapbox() {
+function Mapbox({ mViewActivity }: { mViewActivity?: Activity }) {
   const [storeActivity, setStoreActivity] = useActivityStore((state) => [
     state.storeActivity,
     state.setStoreActivity,
   ]);
 
+  const markerIndex = useMarkerStore((state) => state.markerIndex);
+
   const { isLoaded, isSignedIn, userId } = useAuth();
-  const [stateMap, setStateMap] = useState<Map>();
+  const [stateMap, setStateMap] = useState<any>();
   const [activities, setActivities] = useState<Activity[]>([]);
 
   const mapContainer = useRef(null);
   const map = useRef<Map>();
-
+  const marker = useRef<Marker | null>(null);
   let longlat = [138.770306, -34.97434];
   let zoom = 11;
 
@@ -32,9 +41,9 @@ function Mapbox() {
       if (map.current) return;
       map.current = new mapboxGL.Map({
         container: mapContainer.current as any,
-        style: "mapbox://styles/mapbox/outdoors-v11",
-        center: longlat as any,
-        zoom: zoom,
+        style: CONFIG.MAP.MAP_URL,
+        center: CONFIG.MAP.MAP_DEFAULT_COORDS as any,
+        zoom: CONFIG.MAP.MAP_DEFAULT_ZOOM,
       });
       map.current.addControl(new mapboxGL.NavigationControl());
 
@@ -52,42 +61,7 @@ function Mapbox() {
               activities.map((activity) => {
                 if (!map.current?.getLayer(activity.id)) {
                   // Add the geojson source of each activity
-                  map.current?.addSource(activity.id, {
-                    type: "geojson",
-                    data: {
-                      type: "Feature",
-                      geometry: {
-                        type: "LineString",
-                        coordinates: activity.coordinates,
-                      },
-                      properties: {
-                        description: "Activity",
-                      },
-                    },
-                  });
-                  // Add the line layer on top of the geojson source
-                  map.current?.addLayer({
-                    id: activity.id,
-                    type: "line",
-                    source: activity.id,
-                    layout: {
-                      "line-join": "round",
-                      "line-cap": "round",
-                    },
-                    paint: {
-                      "line-color": activity.metadata.color,
-                      "line-width": 4,
-                    },
-                  });
-                  map.current?.addLayer({
-                    id: `${activity.id}-fill`,
-                    type: "fill",
-                    source: activity.id,
-                    paint: {
-                      "fill-color": "transparent",
-                      "fill-outline-color": "transparent",
-                    },
-                  });
+                  addGpxSourcesAndLayers(map, activity);
                   map.current?.on("mouseenter", `${activity.id}-fill`, () => {
                     map.current!.getCanvas().style.cursor = "pointer";
                     map.current?.setPaintProperty(activity.id, "line-width", 6);
@@ -114,7 +88,10 @@ function Mapbox() {
   useEffect(() => {
     if (storeActivity) {
       setMapLayerVisibility(storeActivity.id);
-      flyToMap(stateMap!, storeActivity);
+      flyToMap(stateMap!, storeActivity, 20);
+    } else if (mViewActivity) {
+      setMapLayerVisibility(mViewActivity.id);
+      flyToMap(stateMap!, mViewActivity, 20);
     } else {
       setMapLayerVisibility(null);
       stateMap?.flyTo({
@@ -122,16 +99,23 @@ function Mapbox() {
         zoom: zoom,
         essential: true,
       });
+      if (marker.current) {
+        marker.current?.remove();
+      }
     }
   }, [storeActivity]);
 
-  function flyToMap(map: mapboxGL.Map, activity: Activity) {
-    let boundary = Turf.lineString(activity.coordinates);
-    let bbox = Turf.bbox(boundary);
-    map.fitBounds(bbox, {
-      padding: 20,
-    });
-  }
+  useEffect(() => {
+    if (marker.current) {
+      marker.current?.remove();
+    }
+    if (markerIndex) {
+      const coords = storeActivity?.coordinates[markerIndex!];
+      marker.current = new mapboxgl.Marker()
+        .setLngLat(coords as LngLatLike)
+        .addTo(map.current!);
+    }
+  }, [markerIndex]);
 
   /**
    * Toggles map layer visibility based on activityId passed in on 'click'
@@ -146,86 +130,15 @@ function Mapbox() {
 
       map.current?.setLayoutProperty(act.id, "visibility", visibility);
 
-      const startCircleSourceId = `${activityId}-start-circle`;
-      const startCircleLayerId = `${activityId}-start`;
-
-      const endCircleSourceId = `${activityId}-end-circle`;
-      const endCircleLayerId = `${activityId}-end`;
-
       if (act.id === activityId) {
-        if (
-          !map.current?.getSource(startCircleSourceId) &&
-          !map.current?.getSource(endCircleSourceId)
-        ) {
-          map.current?.addSource(startCircleSourceId, {
-            type: "geojson",
-            data: {
-              type: "Feature",
-              geometry: {
-                type: "Point",
-                coordinates: act.coordinates[0],
-              },
-              properties: {
-                description: "Start Circle of a gps track",
-              },
-            },
-          });
-
-          map.current?.addSource(endCircleSourceId, {
-            type: "geojson",
-            data: {
-              type: "Feature",
-              geometry: {
-                type: "Point",
-                coordinates: act.coordinates.pop()!,
-              },
-              properties: {
-                description: "End Circle of a gps track",
-              },
-            },
-          });
-        }
-        map.current?.addLayer({
-          id: startCircleLayerId,
-          type: "circle",
-          source: startCircleSourceId,
-          layout: {
-            visibility: "visible",
-          },
-          paint: LAYER_CONFIG.paint.start,
-        });
-        map.current?.addLayer({
-          id: endCircleLayerId,
-          type: "circle",
-          source: endCircleSourceId,
-          layout: {
-            visibility: "visible",
-          },
-          paint: LAYER_CONFIG.paint.end,
-        });
-      } else {
-        // Show all layers
-        map.current?.setLayoutProperty(
-          `${act.id}-fill`,
-          "visibility",
-          "visible"
+        addStartEndCircles(
+          map as any,
+          act.id,
+          act.coordinates[0],
+          act.coordinates.pop()!
         );
-        // Duplication of above, because we don't know which activity was previously selected, we need to re-assign for each track
-        // THEN check if the layer exists, if it does, then it was the previously selected activity, so remove it + source
-        const startCircleSourceId = `${act.id}-start-circle`;
-        const startCircleLayerId = `${act.id}-start`;
-
-        const endCircleSourceId = `${act.id}-end-circle`;
-        const endCircleLayerId = `${act.id}-end`;
-        if (
-          map.current?.getLayer(startCircleLayerId) &&
-          map.current?.getLayer(endCircleLayerId)
-        ) {
-          map.current?.removeLayer(startCircleLayerId);
-          map.current?.removeLayer(endCircleLayerId);
-          map.current?.removeSource(startCircleSourceId);
-          map.current?.removeSource(endCircleSourceId);
-        }
+      } else {
+        hideStartEndCircles(map as any, act.id);
       }
     });
   }

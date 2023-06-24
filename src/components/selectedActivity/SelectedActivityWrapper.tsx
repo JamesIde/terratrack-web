@@ -5,8 +5,11 @@ import { processDistance } from "../../utils/processDistance";
 import { formatShortFormTime } from "../../utils/processTime";
 import { formatElevation } from "../../utils/processElevation";
 import ElevationChart from "./ElevationChart";
+import useMobile from "../../hooks/useMobile";
+import MapboxMobile from "../core/MapboxMobile";
 function SelectedActivityWrapper({ activity }: { activity: Activity }) {
   const setStoreActivity = useActivityStore((state) => state.setStoreActivity);
+  const isMobile = useMobile();
   return (
     <>
       <div className="flex justify-between p-4 border-b-[1px] border-b-gray-300">
@@ -44,6 +47,11 @@ function SelectedActivityWrapper({ activity }: { activity: Activity }) {
             })}
           </p>
         </p>
+        <section>
+          <div className="ml-4 mr-4 border-[1px] rounded-lg border-gray-300 mt-2 mb-5">
+            {isMobile && <MapboxMobile activity={activity} />}
+          </div>
+        </section>
         <section>
           <ElevationChart activity={activity} />
         </section>

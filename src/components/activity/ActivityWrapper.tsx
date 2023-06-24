@@ -40,7 +40,7 @@ function ActivityWrapper() {
   };
 
   return (
-    <div className="mt-12">
+    <div className="">
       <SignedIn>
         {!storeActivity ? (
           <div>
@@ -65,7 +65,8 @@ function ActivityWrapper() {
                 Synced activities from your device will show here
               </p>
               <p className="text-xs pl-4 pr-4 italic">
-                Last Refreshed: {date?.toLocaleTimeString("en-AU")}.{" "}
+                *Best viewed on big screens. Last Refreshed:{" "}
+                {date?.toLocaleTimeString("en-AU")}.{" "}
                 <span
                   className="font-bold text-blue-500 hover:cursor-pointer"
                   onClick={() => fetch()}
