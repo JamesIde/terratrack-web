@@ -1,5 +1,4 @@
 import { SignedIn, UserButton } from "@clerk/clerk-react";
-import { Link } from "react-router-dom";
 import { CONFIG } from "../../config/config";
 function Header() {
   return (
