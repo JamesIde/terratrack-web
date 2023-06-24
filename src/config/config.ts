@@ -18,4 +18,7 @@ export const CONFIG = {
       "circle-stroke-color": "rgba(255, 255, 255, 1)", // White color
     },
   },
+  PRIVACY: {
+    URL: "https://www.jamesaide.com/terratrack/privacy",
+  },
 };

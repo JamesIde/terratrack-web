@@ -1,28 +1,21 @@
 import { ClerkProvider } from "@clerk/clerk-react";
-import Mapbox from "./components/core/Mapbox";
-import Sidebar from "./components/core/Sidebar";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import Home from "./pages/Home";
+import ReactGA from "react-ga";
 const clerkPubKey = import.meta.env.VITE_REACT_APP_CLERK_PUBLISHABLE_KEY;
+
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <Home />,
+  },
+]);
+ReactGA.initialize("G-8375BQ2M4N");
 function App() {
   return (
     <ClerkProvider publishableKey={clerkPubKey}>
-      <Wrapper />
+      <RouterProvider router={router} />
     </ClerkProvider>
-  );
-}
-
-function Wrapper() {
-  return (
-    <>
-      <div className="flex bg-[#f2f7fc]">
-        {/* When screen is smaller than sm, the side bar is the full width */}
-        <div className="w-full sm:w-[400px] h-screen overflow-y-auto">
-          <Sidebar />
-        </div>
-        <div className="hidden sm:block w-auto flex-grow">
-          <Mapbox />
-        </div>
-      </div>
-    </>
   );
 }
 
