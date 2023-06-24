@@ -4,12 +4,16 @@ import { processDistance } from "../../utils/processDistance";
 import { formatElevation } from "../../utils/processElevation";
 import { formatShortFormTime } from "../../utils/processTime";
 import { HiArrowRight } from "react-icons/hi";
+import ReactGA from "react-ga";
 function ActivityItem({ activity }: { activity: Activity }) {
   const setStoreActivity = useActivityStore((state) => state.setStoreActivity);
   return (
     <div
       className="mb-5 border-[1px] border-gray-300 rounded-md hover:cursor-pointer hover:border-gray-400 duration-500 pl-2 pr-2 pt-2"
-      onClick={() => setStoreActivity(activity)}
+      onClick={() => {
+        setStoreActivity(activity);
+        ReactGA.set({ activity: activity.type });
+      }}
     >
       <div className="flex flex-row gap-2">
         <div
