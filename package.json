@@ -14,6 +14,7 @@
     "@supabase/supabase-js": "^2.25.0",
     "@turf/turf": "^6.5.0",
     "@types/mapbox-gl": "^2.7.11",
+    "@vercel/analytics": "^1.0.1",
     "chart.js": "^4.2.1",
     "chartjs-plugin-crosshair": "^1.2.0",
     "geojson-precision": "^1.0.0",
